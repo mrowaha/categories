@@ -10,11 +10,13 @@ export default function App({ Component, pageProps }: AppProps) {
 
   const [animator, _] = React.useState<AnimatorEngine>(new AnimatorEngine());
   const servicesState = useServices();
+  const treeRef = React.useRef<HTMLDivElement | null>(null);
 
   return (
     <AppContext.Provider value={{
       servicesState : servicesState,
-      animator : animator
+      animator : animator,
+      treeRef : treeRef
     } as AppStore}>
       <Component {...pageProps} />
     </AppContext.Provider>

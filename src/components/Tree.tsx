@@ -1,5 +1,8 @@
-import React from "react";
+import React, { use } from "react";
 import classes from "./Tree.module.css";
+
+import { useTreeRef, useAnimator} from "@/context/AppContext";
+
 import Button from "./Button";
 
 interface ArrowButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>{
@@ -31,21 +34,75 @@ function ArrowButton(props : ArrowButtonProps) {
   )
 }
 
-function Tree() {
+const Tree = React.forwardRef<HTMLDivElement, {}>((props, container) => {
+
+  const treeRef = useTreeRef();
+  const animator = useAnimator();
+  const isClicked = React.useRef<boolean>(false);
+
+  React.useEffect(() => {
+    if (treeRef.current === null) return;
+    
+    animator.setTree(treeRef.current);
+
+    const onMouseDown = (e : MouseEvent) => {
+      isClicked.current = true;
+      animator.onTreeClick(e);
+    }
+
+    const onMouseUp = (e : MouseEvent) => {
+      isClicked.current = false;
+      animator.onTreeRelease(treeRef.current!, e);
+    }
+
+    const onMouseMove = (e : MouseEvent) => {
+      if (treeRef.current !== null) {
+        if (!isClicked.current) return;
+        animator.onTreeDrag(treeRef.current!, e);
+      }
+    }
+
+    treeRef.current.addEventListener("mousedown", onMouseDown);
+    treeRef.current.addEventListener("mouseup", onMouseUp);
+    // @ts-ignore
+    container.current.addEventListener("mousemove", onMouseMove);
+    // @ts-ignore
+    container.current.addEventListener("mouseleave", onMouseUp);
+
+    return () => {
+      treeRef.current?.removeEventListener("mousedown", onMouseDown);
+      treeRef.current?.removeEventListener("mouseup", onMouseUp);
+      // @ts-ignore
+      container.current.removeEventListener("mousemove", onMouseMove);
+      // @ts-ignore
+      container.current.removeEventListener("mouseleave", onMouseUp);
+    }
+  }, [])
+
+
   return (
     <div
       style={{
         width : "200px",
         height : "200px",
-        backgroundColor : "blue"
+        backgroundColor : "blue",
+        position : "absolute",
+        cursor : "pointer"
       }}
+      ref={treeRef}
     />
   )
-}
+
+}) 
+
+
 
 function TreeContainer () {
+
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
   return (
-    <div className={classes.treeContainer}>
+    <div className={classes.treeContainer} ref={containerRef}>
       {
         React.Children.toArray(
           [
@@ -85,7 +142,16 @@ function TreeContainer () {
         )
       }
       <div className={classes.drawingBox}>
-        <Tree />
+        <Tree 
+          ref={containerRef}
+        />
+        <div id="drawing-board-center" 
+          style={{
+            width : containerRef.current?.style.width, 
+            height : containerRef.current?.style.height,
+            backgroundColor : "green",
+          }}
+        />
       </div>
     </div>
   )

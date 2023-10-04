@@ -1,6 +1,9 @@
 import React from "react";
 import classes from "./Controls.module.css";
 
+import { useTreeRef, useAnimator} from "@/context/AppContext";
+import type { AllowedZoomLevels } from "@/animator/engine";
+
 import Button from "./Button";
 import useOutsideAlerter from "@/hooks/useOutsideAlert";
 
@@ -11,14 +14,12 @@ function ZoomHandler () {
     if (dropDownRef.current) {
       if (dropDownRef.current.hasAttribute("show")) {
         dropDownRef.current.removeAttribute("show");
-      } else {
-        dropDownRef.current.setAttribute("show", "");
       }
     }
   }, [dropDownRef])
   useOutsideAlerter(dropDownRef, dropDownCallback);
   /* maintain a list of zoom options on client side */
-  const zoomOptions = React.useRef<number[]>([
+  const zoomOptions = React.useRef<AllowedZoomLevels[]>([
     25,
     30,
     40,
@@ -32,7 +33,9 @@ function ZoomHandler () {
     150,
   ])
 
-  const [activeZoom, setActiveZoom] = React.useState<number>(100);
+  const [activeZoom, setActiveZoom] = React.useState<AllowedZoomLevels>(100);
+  const animator = useAnimator();
+  const treeRef = useTreeRef();
 
   return (
     <div className={classes.zoom}>
@@ -43,6 +46,18 @@ function ZoomHandler () {
             <path strokeLinecap="round" strokeLinejoin="round" d="M18 12H6" />
           </svg>
         }
+        onClick={() => {
+          const index = zoomOptions.current.indexOf(activeZoom);
+          let nextIndex = index-1;
+          if (nextIndex === -1) {
+            nextIndex = zoomOptions.current.length-1;
+          } else if (nextIndex === zoomOptions.current.length) {
+            nextIndex = 0;
+          }
+          const zoomLevel = zoomOptions.current[nextIndex];
+          setActiveZoom(zoomLevel);
+          animator.onZoom(treeRef.current!, zoomLevel);
+        }}
       />
       <div className={classes.dropdown}>
         <Button
@@ -63,6 +78,7 @@ function ZoomHandler () {
                   <div onClick={(e) => {
                     e.stopPropagation();
                     setActiveZoom(value);
+                    animator.onZoom(treeRef.current!, value);
                   }}>
                     <div>{value}%</div>
                     {value === activeZoom ? 
@@ -84,12 +100,36 @@ function ZoomHandler () {
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
           </svg>
         }
+        onClick={() => {
+          const index = zoomOptions.current.indexOf(activeZoom);
+          let nextIndex = index+1;
+          if (nextIndex === -1) {
+            nextIndex = zoomOptions.current.length-1;
+          } else if (nextIndex === zoomOptions.current.length) {
+            nextIndex = 0;
+          }
+          const zoomLevel = zoomOptions.current[nextIndex];
+          setActiveZoom(zoomLevel);
+          animator.onZoom(treeRef.current!, zoomLevel);
+        }}
       />
     </div>
   )
 }
 
 function Controls () {
+
+  const animator = useAnimator();
+  const treeRef = useTreeRef();
+
+  React.useEffect(() => {
+    animator.setTree(treeRef.current!);
+  }, [animator])
+
+  const handleCenterTree = React.useCallback(() => {
+    animator.centerTree(treeRef.current as HTMLDivElement);
+  }, [])
+
   return (
     <div className={classes.controls}>
       <Button 
@@ -103,6 +143,7 @@ function Controls () {
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
           </svg>
         }
+        onClick={handleCenterTree}
       />
       <ZoomHandler />
     </div>
