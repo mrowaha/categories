@@ -89,7 +89,7 @@ function TreeNode(props : TreeNodeProps) {
             save ? 
             <>
               {/* @ts-ignore */}
-              <div level={nodeColorCode} className={`${classes.treeNode}`} isService={props.isService}>
+              <div level={nodeColorCode} className={`${classes.treeNode}`} isService={props.isService ? "yes" : "no"}>
                 <h1>{name}</h1>        
                 <div ref={newNodeModalRef} className={classes.newNodeModal}>
                   <h1>What do you want to create?</h1>
