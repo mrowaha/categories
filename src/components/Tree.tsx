@@ -110,30 +110,31 @@ function TreeContainer () {
 
   const containerRef = React.useRef<HTMLDivElement>(null);
   const drawingBoxRef = React.useRef<HTMLDivElement>(null);
+  const treeRef = useTreeRef();
   const actionInterval = React.useRef<any>(null);
 
   const verticalTranslate = React.useRef<number>(0);
   const horizontalTranslate = React.useRef<number>(0);
 
   const handleDrawingBoxMove = (dir : "top" | "bottom" | "left" | "right") => {
-    if (drawingBoxRef.current === null) return;
+    if (treeRef.current === null) return;
 
     switch(dir) {
       case "top":
-        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current-20}px)`;
-        verticalTranslate.current -= 20; 
+        treeRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current+20}px)`;
+        verticalTranslate.current += 20; 
         break;
       case "bottom":
-        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current+20}px)`;
-        verticalTranslate.current += 20;
+        treeRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current-20}px)`;
+        verticalTranslate.current -= 20;
         break;
       case "left":
-        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current-20}px, ${verticalTranslate.current}px)`;
-        horizontalTranslate.current -= 20;  
+        treeRef.current.style.transform = `translate(${horizontalTranslate.current+20}px, ${verticalTranslate.current}px)`;
+        horizontalTranslate.current += 20;  
         break;
       case "right":
-        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current+20}px, ${verticalTranslate.current}px)`;
-        horizontalTranslate.current += 20;  
+        treeRef.current.style.transform = `translate(${horizontalTranslate.current-20}px, ${verticalTranslate.current}px)`;
+        horizontalTranslate.current -= 20;  
         break;  
     }
   }
@@ -144,17 +145,13 @@ function TreeContainer () {
 
   React.useEffect(() => {
     const resetTranslation = () => {
-      if (drawingBoxRef.current !== null) {
-        drawingBoxRef.current.style.transform = `translate(0px, 0px)`;
-        horizontalTranslate.current = 0;
-        verticalTranslate.current = 0;
-      }      
+      horizontalTranslate.current = 0;
+      verticalTranslate.current = 0;
     }
 
     window.addEventListener("tree:resetBox", resetTranslation);
     return () => window.removeEventListener("tree:resetBox", resetTranslation)
-
-  }, [drawingBoxRef])
+  }, [])
 
 
   return (
