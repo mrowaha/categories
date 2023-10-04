@@ -1,0 +1,64 @@
+.treeContainer {
+  flex : 1;
+  width: 100%;
+  background-color: #e0e0e088;
+  overflow: hidden;
+  display: grid;
+  grid-template-areas: 
+  "toparrow toparrow toparrow"
+  "leftarrow draw rightarrow"
+  "bottomarrow bottomarrow bottomarrow"
+  ;
+  grid-template-columns: 50px auto 50px;
+  grid-template-rows: 50px auto 50px;
+}
+
+.directionArrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(128, 128, 128, 0.01);
+}
+
+.directionArrow > button{
+  background-color:  #e0e0e0 !important;
+  border : none !important;
+  color : #fff !important;
+}
+
+.directionArrow:where(:hover, :focus) > button{
+  background-color:  #e0e0e088 !important;
+}
+
+.directionArrow[align="horizontal"] > button {
+  width : 10rem !important;
+}
+
+.directionArrow[align="vertical"] > button {
+  height: 10rem !important;
+  max-height : 10rem !important;
+}
+
+.directionArrow[align="vertical"] > button > div{
+  display: flex;
+}
+
+.topArrow {
+  grid-area: toparrow;
+}
+
+.bottomArrow {
+  grid-area: bottomarrow;
+}
+
+.leftArrow {
+  grid-area: leftarrow;
+}
+
+.rightArrow {
+  grid-area: rightarrow;
+}
+
+.drawingBox {
+  grid-area: draw;
+}

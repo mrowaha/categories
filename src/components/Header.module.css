@@ -1,0 +1,22 @@
+.header {
+  background-color: #e0e0e055;
+  border-bottom : 2px solid #33333322;
+  display : flex;
+  align-items: center;
+  padding : 1.5rem;
+  justify-content: space-between;
+}
+
+.titleContainer {
+  display: flex;
+  gap : 5px;
+  justify-content: center;
+  align-items: baseline;
+}
+
+.title {
+  font-weight: 100;
+  font-size: 1.5rem;
+  position: relative;
+  top : 3px;
+}

@@ -1,0 +1,38 @@
+.button {
+  padding : 0.75rem;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height : fit-content;
+  max-height: 40px;
+  width : fit-content;
+  gap : 2px;
+}
+
+.button:hover {
+  cursor: pointer;
+}
+
+.button[variant="primary"]{
+  background-color: #fff;
+  border : 1px solid #fff;
+  color : grey;
+}
+
+.button[variant="primary"]:hover {
+  border: 1px solid #2196f3;
+  border: 1px solid #2196f3;
+  border: 1px solid #2196f3;
+  border: 1px solid #2196f3;
+  border: 1px solid #2196f3;
+}
+
+.button[variant="secondary"]{
+  background-color: #2196f3;
+  border : 1px solid #2196f3;
+  color : #fff;
+}
+
+.button[variant="secondary"]:hover {
+  border: 1px solid #fff;
+}
