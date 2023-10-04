@@ -121,6 +121,7 @@ class AnimatorEngine {
     centerDiv.style.width = `${treeRect.width}px`;
     centerDiv.style.height = `${treeRect.height}px`;
     this.setTree(tree);
+
   }
 
   /**
@@ -136,8 +137,14 @@ class AnimatorEngine {
       return;
     }
 
+    
+    tree.style.transform = "scale(1)";
     // the width and height of the center element should be negligible
     const centerDiv : HTMLDivElement = document.getElementById("drawing-board-center") as HTMLDivElement;
+    const treeRect = tree.getBoundingClientRect();
+    centerDiv.style.width = `${treeRect.width}px`;
+    centerDiv.style.height = `${treeRect.height}px`;
+
     const finalOffsetTop = centerDiv.offsetTop;
     const finalOffsetLeft = centerDiv.offsetLeft; 
 
@@ -146,6 +153,7 @@ class AnimatorEngine {
 
     console.log(`center top: ${finalOffsetTop} | center left: ${finalOffsetLeft}`);
     console.log(`tree top: ${currentOffsetTop} | tree left : ${currentOffsetLeft}`);
+
 
     let animationId : number;
     const animate = () => {

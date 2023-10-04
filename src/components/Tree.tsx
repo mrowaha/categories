@@ -4,6 +4,7 @@ import classes from "./Tree.module.css";
 import { useTreeRef, useAnimator} from "@/context/AppContext";
 
 import Button from "./Button";
+import { flushSync } from "react-dom";
 
 interface ArrowButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>{
   direction : "top" | "bottom" | "left" | "right";
@@ -29,6 +30,8 @@ function ArrowButton(props : ArrowButtonProps) {
       <Button 
         color="primary"
         icon={props.icon}
+        onMouseEnter={props.onMouseEnter}
+        onMouseLeave={props.onMouseLeave}
       />
     </div>
   )
@@ -41,6 +44,7 @@ const Tree = React.forwardRef<HTMLDivElement, {}>((props, container) => {
   const isClicked = React.useRef<boolean>(false);
 
   React.useEffect(() => {
+
     if (treeRef.current === null) return;
     
     animator.setTree(treeRef.current);
@@ -100,6 +104,53 @@ const Tree = React.forwardRef<HTMLDivElement, {}>((props, container) => {
 function TreeContainer () {
 
   const containerRef = React.useRef<HTMLDivElement>(null);
+  const drawingBoxRef = React.useRef<HTMLDivElement>(null);
+  const actionInterval = React.useRef<any>(null);
+
+  const verticalTranslate = React.useRef<number>(0);
+  const horizontalTranslate = React.useRef<number>(0);
+
+  const handleDrawingBoxMove = (dir : "top" | "bottom" | "left" | "right") => {
+    if (drawingBoxRef.current === null) return;
+
+    switch(dir) {
+      case "top":
+        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current-50}px)`;
+        verticalTranslate.current -= 50; 
+        break;
+      case "bottom":
+        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current+50}px)`;
+        verticalTranslate.current += 50;
+        break;
+      case "left":
+        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current-50}px, ${verticalTranslate.current}px)`;
+        horizontalTranslate.current -= 50;  
+        break;
+      case "right":
+        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current+50}px, ${verticalTranslate.current}px)`;
+        horizontalTranslate.current += 50;  
+        break;  
+    }
+  }
+
+  const handleDrawingBoxMoveWrapper  = (dir : ArrowButtonProps["direction"]) => {
+    actionInterval.current = setInterval(handleDrawingBoxMove, 100, dir);
+  }
+
+  React.useEffect(() => {
+    const resetTranslation = () => {
+      if (drawingBoxRef.current !== null) {
+        drawingBoxRef.current.style.transform = `translate(0px, 0px)`;
+        horizontalTranslate.current = 0;
+        verticalTranslate.current = 0;
+      }      
+    }
+
+    window.addEventListener("tree:resetBox", resetTranslation);
+    return () => window.removeEventListener("tree:resetBox", resetTranslation)
+
+  }, [drawingBoxRef])
+
 
   return (
     <div className={classes.treeContainer} ref={containerRef}>
@@ -136,22 +187,32 @@ function TreeContainer () {
                 direction={dir as ArrowButtonProps["direction"]}
                 icon={svg as React.ReactNode}
                 alignment={dir === "top" || dir === "bottom" ? "horizontal" : "vertical"}
+                // @ts-ignore
+                onMouseEnter={() => handleDrawingBoxMoveWrapper(dir)}
+                onMouseLeave={() => {
+                  if (actionInterval.current) {
+                    clearInterval(actionInterval.current);
+                    actionInterval.current = null;
+                  }
+                }}
               />
             )
           })
         )
       }
-      <div className={classes.drawingBox}>
-        <Tree 
-          ref={containerRef}
-        />
-        <div id="drawing-board-center" 
-          style={{
-            width : containerRef.current?.style.width, 
-            height : containerRef.current?.style.height,
-            backgroundColor : "green",
-          }}
-        />
+      <div ref={drawingBoxRef} style={{gridArea : "draw", overflow : "hidden"}}>
+        <div  className={classes.drawingBox}>
+          <Tree 
+            ref={containerRef}
+          />
+          <div id="drawing-board-center" 
+            style={{
+              width : containerRef.current?.style.width, 
+              height : containerRef.current?.style.height,
+              backgroundColor : "none",
+            }}
+          />
+        </div>
       </div>
     </div>
   )

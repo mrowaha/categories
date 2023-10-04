@@ -1,7 +1,7 @@
 import React from "react";
 import classes from "./Controls.module.css";
 
-import { useTreeRef, useAnimator} from "@/context/AppContext";
+import { useTreeRef, useAnimator, useZoomContext} from "@/context/AppContext";
 import type { AllowedZoomLevels } from "@/animator/engine";
 
 import Button from "./Button";
@@ -33,9 +33,10 @@ function ZoomHandler () {
     150,
   ])
 
-  const [activeZoom, setActiveZoom] = React.useState<AllowedZoomLevels>(100);
+
   const animator = useAnimator();
   const treeRef = useTreeRef();
+  const [activeZoom, setActiveZoom] = useZoomContext();
 
   return (
     <div className={classes.zoom}>
@@ -121,13 +122,16 @@ function Controls () {
 
   const animator = useAnimator();
   const treeRef = useTreeRef();
+  const [activeZoom, setActiveZoom] = useZoomContext();
 
   React.useEffect(() => {
     animator.setTree(treeRef.current!);
   }, [animator])
 
   const handleCenterTree = React.useCallback(() => {
+    setActiveZoom(100);
     animator.centerTree(treeRef.current as HTMLDivElement);
+    window.dispatchEvent(new Event("tree:resetBox"));
   }, [])
 
   return (

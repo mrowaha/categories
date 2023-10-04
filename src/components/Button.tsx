@@ -1,5 +1,6 @@
 import React from "react";
 import classes from "./Button.module.css";
+import { clearInterval } from "timers";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>{
   text? : string;
@@ -8,8 +9,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>{
 }
 
 function Button(props : ButtonProps) {
-
   const buttonRef = React.useRef<HTMLButtonElement | null>(null);
+  
   React.useLayoutEffect(() => {
     if (buttonRef.current !== null) {
       buttonRef.current.setAttribute("variant", props.color)
@@ -20,6 +21,8 @@ function Button(props : ButtonProps) {
     <button 
       className={`${classes.button} ${props.className ? props.className : ""}`}
       onClick={props.onClick}
+      onMouseEnter={props.onMouseEnter}
+      onMouseLeave={props.onMouseLeave}
       style={{...props.style}}
       ref={buttonRef}
     >

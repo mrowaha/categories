@@ -1,6 +1,6 @@
 import React from "react";
 import AnimatorEngine from "@/animator/engine";
-import AppContext, {useServices} from "@/context/AppContext";
+import AppContext, {useActiveZoom, useServices, useZoomContext} from "@/context/AppContext";
 import type { AppStore } from "@/context/AppContext";
 
 import '@/styles/globals.css'
@@ -11,12 +11,14 @@ export default function App({ Component, pageProps }: AppProps) {
   const [animator, _] = React.useState<AnimatorEngine>(new AnimatorEngine());
   const servicesState = useServices();
   const treeRef = React.useRef<HTMLDivElement | null>(null);
+  const zoomState = useActiveZoom();
 
   return (
     <AppContext.Provider value={{
       servicesState : servicesState,
       animator : animator,
-      treeRef : treeRef
+      treeRef : treeRef,
+      zoomState : zoomState
     } as AppStore}>
       <Component {...pageProps} />
     </AppContext.Provider>
