@@ -1,6 +1,5 @@
 import React from "react";
 import classes from "./Button.module.css";
-import { clearInterval } from "timers";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>{
   text? : string;

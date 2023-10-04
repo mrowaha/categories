@@ -1,10 +1,10 @@
-import React, { use } from "react";
+import React from "react";
 import classes from "./Tree.module.css";
 
 import { useTreeRef, useAnimator} from "@/context/AppContext";
 
 import Button from "./Button";
-import { flushSync } from "react-dom";
+import TreeNode from "./TreeNode";
 
 interface ArrowButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>{
   direction : "top" | "bottom" | "left" | "right";
@@ -89,16 +89,21 @@ const Tree = React.forwardRef<HTMLDivElement, {}>((props, container) => {
       style={{
         width : "200px",
         height : "200px",
-        backgroundColor : "blue",
         position : "absolute",
         cursor : "pointer"
       }}
       ref={treeRef}
-    />
+    >
+      <TreeNode 
+        root
+        // @ts-ignore
+        level={-1}
+        isService={false}
+      />
+    </div>
   )
 
 }) 
-
 
 
 function TreeContainer () {
@@ -115,20 +120,20 @@ function TreeContainer () {
 
     switch(dir) {
       case "top":
-        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current-50}px)`;
-        verticalTranslate.current -= 50; 
+        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current-20}px)`;
+        verticalTranslate.current -= 20; 
         break;
       case "bottom":
-        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current+50}px)`;
-        verticalTranslate.current += 50;
+        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current+20}px)`;
+        verticalTranslate.current += 20;
         break;
       case "left":
-        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current-50}px, ${verticalTranslate.current}px)`;
-        horizontalTranslate.current -= 50;  
+        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current-20}px, ${verticalTranslate.current}px)`;
+        horizontalTranslate.current -= 20;  
         break;
       case "right":
-        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current+50}px, ${verticalTranslate.current}px)`;
-        horizontalTranslate.current += 50;  
+        drawingBoxRef.current.style.transform = `translate(${horizontalTranslate.current+20}px, ${verticalTranslate.current}px)`;
+        horizontalTranslate.current += 20;  
         break;  
     }
   }

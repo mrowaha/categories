@@ -11,7 +11,7 @@ interface TitleProps {
 
 function Title (props : TitleProps) {
 
-  const [services, setServices] = useServicesContext();
+  const [services, _] = useServicesContext();
 
   return (
     <div className={classes.titleContainer}>

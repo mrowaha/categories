@@ -1,0 +1,134 @@
+.treeNodeContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap : 2px;
+  position: relative;
+}
+
+.treeNode {
+  display: flex;
+  justify-content: flex-start;
+  width: fit-content;
+  max-width: 100px;
+  padding : 0.25rem;
+  color : grey;
+  font-size: 0.5rem;
+  border: 1px dashed grey;
+  background-color: #fff;
+  margin : 0.45rem;
+  position: relative;
+}
+
+.newNodeModal {
+  background-color: white;
+  z-index: 9999;
+  position: absolute;
+  top : 40%;
+  right : -50px;
+  left: 0;
+  color : grey;
+  font-size: 0.45rem;
+  text-align: center;
+  padding : 0.5rem;
+  display: none;
+  min-width: 150px;
+}
+
+.newNodeAction {
+  border : none;
+  margin : 0.2rem;
+  padding : 0.1rem;
+  color: grey;
+}
+
+.newNodeAction:hover {
+  cursor: pointer;
+}
+
+.treeNode > h1 {
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+  width : 100%;
+  overflow: hidden;
+}
+
+.treeNode[level="0"] {
+  background-color: orange;
+  border: 1px solid orange;
+  color : #fff;
+}
+
+.treeNode[level="1"] {
+  background-color: #2196f3;
+  border: 1px solid #2196f3;
+  color : #fff;
+}
+
+.treeNode[level="2"] {
+  background-color: #ccc;
+  border: 1px solid #ccc;
+  color : #fff;
+}
+
+.treeNode > input {
+  all : unset;
+  font-size: 0.8rem;
+  width: 75px;
+}
+
+.root {
+  background-color: #fff;
+  border: 1px dashed grey;
+  font-size: 0.55rem;
+}
+
+.nodeChildren {
+  display: flex;
+}
+
+.actionBtn {
+  border: none;
+  background-color: none;
+}
+
+.actionBtn > svg {
+  width : 15px;
+  aspect-ratio: 1 / 1;
+  padding : 0;
+  margin : 0;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.actionBtn[disabled] > svg {
+  display: none;
+}
+
+
+.actionBtn > svg:hover {
+  cursor: pointer;
+}
+
+
+.actionBtn[variant="primary"] > svg {
+  background-color: #ccc;
+  color : #fff;
+}
+
+.actionBtn[variant="warning"] > svg {
+  background-color: orange;
+  color : #fff;
+}
+
+.actionBtn[variant="success"] > svg {
+  background-color: green;
+  color : #fff;
+}
+
+.actionBtn[variant="error"] > svg {
+  background-color: red;
+  color : #fff;
+}
