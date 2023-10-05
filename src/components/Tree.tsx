@@ -86,20 +86,20 @@ const Tree = React.forwardRef<HTMLDivElement, {}>((props, container) => {
 
   return (
     <div
-      style={{
-        width : "200px",
-        height : "200px",
-        position : "absolute",
-        cursor : "pointer"
-      }}
+      className={classes.treeWrapper}
       ref={treeRef}
     >
-      <TreeNode 
-        root
-        // @ts-ignore
-        level={-1}
-        isService={false}
-      />
+      <div className={classes.tree}>
+        <TreeNode 
+          root
+          // @ts-ignore
+          level={-1}
+          isService={false}
+        />
+      </div>
+      <canvas className={classes.treeCanvasBackdrop}>
+
+      </canvas>
     </div>
   )
 

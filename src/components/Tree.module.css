@@ -68,3 +68,23 @@
   height: 100%;
   width: 100%;
 }
+
+.treeWrapper {
+  min-width : 200px;
+  width: fit-content;
+  position : absolute;
+  cursor: pointer;
+}
+
+.tree {
+  background-color: transparent;
+}
+
+.treeCanvasBackdrop {
+  background-color: #e0e0e0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  position: absolute;
+}
