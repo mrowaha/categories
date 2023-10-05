@@ -157,6 +157,7 @@ class AnimatorEngine {
 
     
     tree.style.transform = "scale(1)";
+    this.__zoomLevel = 100;
     // the width and height of the center element should be negligible
     const centerDiv : HTMLDivElement = document.getElementById("drawing-board-center") as HTMLDivElement;
     const treeRect = tree.getBoundingClientRect();
