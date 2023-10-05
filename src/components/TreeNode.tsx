@@ -83,15 +83,12 @@ function TreeNode(props : TreeNodeProps) {
   }, [props.isService]) 
 
   React.useEffect(() => {
-    const cleanup = animator.drawHorizontalBranch(
-      treeRef.current!,
+    animator.drawHorizontalBranch(
       parentNodeRef.current!,
-      horizontalLineRef.current!,
-      classes.nodeChildren
+      classes.nodeChildren,
+      classes.treeNodeBranchVertical
     )
-
-    return () => cleanup()
-  }, [])
+  }, [nodeChildren])
 
   return (
     <div
@@ -105,7 +102,10 @@ function TreeNode(props : TreeNodeProps) {
     >
       { !props.root && 
         <div>
-          <div className={classes.treeNodeBranchVertical}>         
+          <div className={classes.treeNodeBranchVertical}>
+             <svg xmlns="http://www.w3.org/2000/svg">
+                <line x1="0" y1="0" x2="0" y2="0" stroke="grey" stroke-width="1" />
+            </svg>           
           </div> 
         </div> 
       }
@@ -230,21 +230,11 @@ function TreeNode(props : TreeNodeProps) {
         !props.root ? 
           <div>
             <div className={classes.treeNodeBranchVertical}>
-              <div className={classes.treeNodeBranchHorizontal}>
-                <svg ref={horizontalLineRef} xmlns="http://www.w3.org/2000/svg">
-                  <line x1="0" y1="10" x2="0" y2="10" stroke="grey" stroke-width="1" />
-                </svg> 
-              </div>
             </div>
           </div> :
           <div>
           {/* @ts-ignore */}
             <div className={classes.treeNodeBranchVertical} type="large">
-              <div className={classes.treeNodeBranchHorizontal}>
-                <svg ref={horizontalLineRef}  xmlns="http://www.w3.org/2000/svg">
-                  <line x1="0" y1="10" x2="0" y2="10" stroke="grey" stroke-width="1" />
-                </svg> 
-              </div>
             </div>
           </div>
       } 
@@ -255,6 +245,7 @@ function TreeNode(props : TreeNodeProps) {
             return (
               <div className="node" key={id}>
                 <TreeNode 
+                root={false}
                 onCancel={() => handleOnCancel(id)} 
                 id={id} 
                 level={props.level+1}
