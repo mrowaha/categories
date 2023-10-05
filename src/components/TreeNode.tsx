@@ -112,7 +112,8 @@ function TreeNode(props : TreeNodeProps) {
         display : "flex",
         flexDirection : "column",
         alignItems : "center",
-        justifyContent : "flex-start"
+        justifyContent : "flex-start",
+        margin : "0 0.75rem"
       }}
     >
       { !props.root && 
