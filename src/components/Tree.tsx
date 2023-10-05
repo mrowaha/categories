@@ -97,9 +97,7 @@ const Tree = React.forwardRef<HTMLDivElement, {}>((props, container) => {
           isService={false}
         />
       </div>
-      <canvas className={classes.treeCanvasBackdrop}>
-
-      </canvas>
+      <div className={classes.treeCanvasBackdrop} />
     </div>
   )
 

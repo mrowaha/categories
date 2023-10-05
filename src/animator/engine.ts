@@ -24,6 +24,7 @@ export type AllowedZoomLevels =
 
 class AnimatorEngine {
 
+
   private __zoomLevel: number;
 
   // used for dragging
@@ -185,6 +186,140 @@ class AnimatorEngine {
     return () => cancelAnimationFrame(animationId)
   }
 
+  /**
+   * animator support for drawing vertical branches between two nodes 
+   * over the canvas backdrop for the tree
+   * @param {HTMLDivElement} tree the tree container for selecting backdrop
+   * @param {HTMLDivElement} parentNode the parent node to check the descendants for
+   * @param {SVGSVGElement} horizontalsvg the embbed svg line
+   * @param {string} nodeContainerClass the classname for the node container 
+  */
+  drawHorizontalBranch(
+    tree : HTMLDivElement,
+    parentNode : HTMLDivElement,
+    horizontalsvg : SVGSVGElement,
+    nodeContainerClass : string
+  ) {
+
+    const children = parentNode.querySelectorAll("*");
+    const lowerBranch = children[children.length - 2];
+    const line = horizontalsvg.querySelectorAll("*")[0];
+
+    interface DOMResult {
+      noChildren: boolean;
+      hasFirstChild: boolean;
+      hasLastChild: boolean;
+      childrenCount : number;
+      firstChild?: Element;
+      lastChild?: Element;
+    }
+    const selectEndChildElements = (): DOMResult => {
+      // this function will query the DOM to get the first
+      // and the last child elements
+      // this will determine the width of the horizontal branch
+      // line required by the animator to draw
+      const nodeContainer = parentNode.querySelector(`.${nodeContainerClass}`);
+      console.log(nodeContainer);
+      if (nodeContainer === null) {
+        return {
+          noChildren: true,
+          hasFirstChild: false,
+          hasLastChild: false,
+          childrenCount : 0
+        };
+      }
+    
+      const childElements = nodeContainer.children;
+      if (childElements.length === 0) {
+        // there cannot be a last child if there were no children !
+        return {
+          noChildren: true,
+          hasFirstChild: false,
+          hasLastChild: false,
+          childrenCount : 0
+        };
+      }
+    
+      // Get the first child element
+      const firstChild = childElements[0];
+    
+      // If there's only one child element, return it as the first child and not as the last child
+      if (childElements.length === 1) {
+        return {
+          noChildren: false,
+          hasFirstChild: true,
+          hasLastChild: false,
+          firstChild: firstChild,
+          childrenCount : 1
+        };
+      }
+    
+      // Get the last child element
+      const lastChild = childElements[childElements.length - 1];
+    
+      return {
+        noChildren: false,
+        hasFirstChild: true,
+        hasLastChild: true,
+        firstChild: firstChild,
+        lastChild: lastChild,
+        childrenCount : nodeContainer.childElementCount
+      };
+    };
+    
+
+    const resizeCallback = () => {
+      const {noChildren, 
+        hasFirstChild, 
+        hasLastChild,
+        firstChild,
+        lastChild,
+        childrenCount
+      } : DOMResult = selectEndChildElements();
+      
+      if (noChildren) {
+        line.setAttribute("x2", "0");
+        const svgContainer = horizontalsvg.parentElement!;
+        svgContainer.style.transform = `translateX(0px)`;             
+        return;
+      }
+
+      const lowerBranchRect = lowerBranch.getBoundingClientRect();
+      if (hasFirstChild) {
+          let children = firstChild?.querySelectorAll("*")!;
+          const upperBranchFirst = children[1];
+          // now we have upper and lower branches for the two nodes that we need to connect
+          const upperBranchFirstRect = upperBranchFirst.getBoundingClientRect();
+          let horizontalTranslate = Math.abs(lowerBranchRect.x - upperBranchFirstRect.x);
+          let horizontalDiff;
+          // has at least two nodes as determined by the dom accesses
+          if (hasLastChild) {
+            children = lastChild?.querySelectorAll("*")!;
+            const upperBranchLast = children[1];
+            const upperBranchLastRect = upperBranchLast.getBoundingClientRect();
+            horizontalDiff = Math.abs(upperBranchFirstRect.x - upperBranchLastRect.x);
+            horizontalTranslate = horizontalDiff;
+            if (childrenCount > 2) {
+              horizontalTranslate -= Math.abs(lowerBranchRect.x - upperBranchLastRect.x);
+            }
+          } else {
+            horizontalDiff = horizontalTranslate;
+          }
+          line.setAttribute("x2", `${horizontalDiff+1}`);
+          const svgContainer = horizontalsvg.parentElement!;
+          svgContainer.style.transform = `translateX(-${horizontalTranslate}px)`;  
+      }
+    }
+  
+    const resizeObserver = new ResizeObserver(resizeCallback);
+    resizeObserver.observe(tree);
+
+    return () => resizeObserver.unobserve(tree);
+  }
+
 }
+
+
+
 
 export default AnimatorEngine;

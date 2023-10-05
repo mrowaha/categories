@@ -2,10 +2,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap : 2px;
   position: relative;
-  margin : 0.45rem;
-
+  gap : 2px;
 }
 
 .treeNode {
@@ -89,7 +87,7 @@
 }
 
 /* render the upper arrow */
-.treeNode::after {
+/* .treeNode::after {
   content: "";
   position: absolute;
   width: 1px;
@@ -111,7 +109,7 @@
   left: 50%;
   transform: translateY(100%);
   display: block;
-}
+} */
 
 
 .root {
@@ -120,9 +118,33 @@
   font-size: 0.55rem;
 }
 
-.root::after {
+/* .root::after {
   display: none;
+} */
+
+.treeNodeBranchVertical {
+  width: 1px;
+  height: 10px;
+  background-color: grey;
+  position: relative;
 }
+
+.treeNodeContainer > svg {
+  position: absolute;
+}
+
+div:has( > div.treeNodeBranchVertical) {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+div:has( > div.treeNodeBranchVertical[type="large"]) {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
 
 .nodeChildren {
   display: flex;

@@ -1,8 +1,7 @@
 import React from "react";
 import classes from "./TreeNode.module.css";
-import { useServicesContext } from "@/context/AppContext";
+import { useAnimator, useServicesContext, useTreeRef } from "@/context/AppContext";
 import useOutsideAlerter from "@/hooks/useOutsideAlert";
-import { flushSync } from "react-dom";
 
 interface TreeActionButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon : React.ReactNode;  
@@ -36,6 +35,8 @@ interface TreeChildNode {
 function TreeNode(props : TreeNodeProps) {
 
   const nodeColorCode = props.level % 3;
+  const animator = useAnimator();
+  const treeRef = useTreeRef();
   const [nextId, setNextId] = React.useState<number>(1);
   const [nodeChildren, setNodeChildren] = React.useState<TreeChildNode[]>([]);
   const [name, setName] = React.useState<string>("");
@@ -43,10 +44,7 @@ function TreeNode(props : TreeNodeProps) {
   const [_, setServices] = useServicesContext();
 
   const parentNodeRef = React.useRef<HTMLDivElement>(null);
-  const firstChildRef = React.useRef<HTMLDivElement>(null);
-  const lastChildRef = React.useRef<HTMLDivElement>(null);
-  const svgRef = React.useRef<HTMLDivElement>(null);
-
+  const horizontalLineRef = React.useRef<SVGSVGElement>(null);
 
   const newNodeModalRef = React.useRef<HTMLDivElement>(null);
   useOutsideAlerter(newNodeModalRef, () => {
@@ -75,20 +73,8 @@ function TreeNode(props : TreeNodeProps) {
       newNodeModalRef.current.style.display = "none";
   }
 
-  React.useLayoutEffect(() => {
-    if (firstChildRef.current && parentNodeRef.current && svgRef.current) {
-      const rect1 = firstChildRef.current.getBoundingClientRect();
-      const rect2 = parentNodeRef.current.getBoundingClientRect();
-      const diff = Math.abs(rect1.left - rect2.left);
-      svgRef.current.style.width = `${diff}px`;
-      svgRef.current.style.transform = `translateX(-50%)`;
-    }
-
-  })
-
-
   React.useEffect(() => {
-    // only return a cleanup function to decrement service count if
+    // return a cleanup function to decrement service count if
     // the node unmounts
     // required to also decrement nested services
     return () => {
@@ -96,9 +82,20 @@ function TreeNode(props : TreeNodeProps) {
     }
   }, [props.isService]) 
 
+  React.useEffect(() => {
+    const cleanup = animator.drawHorizontalBranch(
+      treeRef.current!,
+      parentNodeRef.current!,
+      horizontalLineRef.current!,
+      classes.nodeChildren
+    )
+
+    return () => cleanup()
+  }, [])
 
   return (
     <div
+      ref={parentNodeRef}
       style={{
         display : "flex",
         flexDirection : "column",
@@ -106,11 +103,17 @@ function TreeNode(props : TreeNodeProps) {
         justifyContent : "flex-start"
       }}
     >
+      { !props.root && 
+        <div>
+          <div className={classes.treeNodeBranchVertical}>         
+          </div> 
+        </div> 
+      }
       <div className={`${classes.treeNodeContainer} ` + (props.root && classes.rootContainer)}>
         {
           props.root ? 
           // @ts-ignore
-          <div ref={parentNodeRef} className={`${classes.treeNode} ${classes.root}`}>
+          <div className={`${classes.treeNode} ${classes.root}`}>
             <h1>Categories</h1>
           </div> :
           <>
@@ -118,7 +121,7 @@ function TreeNode(props : TreeNodeProps) {
             save ? 
             <>
               {/* @ts-ignore */}
-              <div ref={parentNodeRef} level={nodeColorCode} className={`${classes.treeNode}`} isService={props.isService ? "yes" : "no"}>
+              <div level={nodeColorCode} className={`${classes.treeNode}`} isService={props.isService ? "yes" : "no"}>
                 {
                   props.isService && 
                   <span className={classes.serviceTag}/>
@@ -140,7 +143,7 @@ function TreeNode(props : TreeNodeProps) {
               </div>
             </>
               :
-              <div ref={parentNodeRef} className={`${classes.treeNode}`}>
+              <div className={`${classes.treeNode}`}>
                 <input 
                   type="text" 
                   value={name} 
@@ -223,37 +226,34 @@ function TreeNode(props : TreeNodeProps) {
         />
         }
       </div>
+      {
+        !props.root ? 
+          <div>
+            <div className={classes.treeNodeBranchVertical}>
+              <div className={classes.treeNodeBranchHorizontal}>
+                <svg ref={horizontalLineRef} xmlns="http://www.w3.org/2000/svg">
+                  <line x1="0" y1="10" x2="0" y2="10" stroke="grey" stroke-width="1" />
+                </svg> 
+              </div>
+            </div>
+          </div> :
+          <div>
+          {/* @ts-ignore */}
+            <div className={classes.treeNodeBranchVertical} type="large">
+              <div className={classes.treeNodeBranchHorizontal}>
+                <svg ref={horizontalLineRef}  xmlns="http://www.w3.org/2000/svg">
+                  <line x1="0" y1="10" x2="0" y2="10" stroke="grey" stroke-width="1" />
+                </svg> 
+              </div>
+            </div>
+          </div>
+      } 
+      {/* @ts-ignore */}
       <div className={classes.nodeChildren}>
         {
           nodeChildren.map(({id, isService}, index, arr) => {
-            if (index === 0) {
-              return (
-                <div key={id} ref={firstChildRef}>
-                  <TreeNode 
-                  onCancel={() => handleOnCancel(id)} 
-                  id={id} 
-                  level={props.level+1}
-                  allowService
-                  isService={isService}
-                  />
-                </div>  
-              )
-            } else if (index === arr.length) {
-              return (
-                <div key={id} ref={lastChildRef}>
-                  <TreeNode 
-                  onCancel={() => handleOnCancel(id)} 
-                  id={id} 
-                  level={props.level+1}
-                  allowService
-                  isService={isService}
-                  />
-                </div> 
-              )
-            }
-            
             return (
-              <div key={id}>
+              <div className="node" key={id}>
                 <TreeNode 
                 onCancel={() => handleOnCancel(id)} 
                 id={id} 
