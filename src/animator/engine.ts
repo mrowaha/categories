@@ -22,11 +22,17 @@ export type AllowedZoomLevels =
   125 |
   150;
 
+export interface TreeListElement {
+  name : string;
+  type : "service" | "category";
+  children : TreeListElement[];
+}
+
 class AnimatorEngine {
 
 
   private __zoomLevel: number;
-
+  private __snapshot : any;
   // used for dragging
   private __startX : number;
   private __startY : number;
@@ -247,7 +253,88 @@ class AnimatorEngine {
       line.setAttribute("x2", "0");
     }
   }
+
+  /**
+   * animator support for getting tree snapshot as a JSON Object
+   * @param {HTMLDivElement} tree the tree component
+   * @param {string} nodeChildrenClass class name containing children
+   * @param {string} currentNodeClass class name wrapping currentNode
+   * @param {string} nodeNameClass class name holding the node name
+   */
+  getTreeSnapshot(
+    tree : HTMLDivElement,
+    nodeChildrenClass : string,
+    currentNodeClass : string,
+    nodeNameClass : string
+  ) {
+    const rootNode = tree.querySelectorAll(`.${currentNodeClass}`)[0];
+    if (!rootNode) {
+      return JSON.stringify({});
+    }
+    // else instantiate the object
+    return JSON.stringify(this.__getTreeSnapshotRecursive(rootNode as HTMLDivElement, nodeChildrenClass, currentNodeClass, nodeNameClass), null, 2) 
+  }
+
+  __getTreeSnapshotRecursive(
+    currentNode : HTMLDivElement,
+    nodeChildrenClass : string,
+    currentNodeClass : string,
+    nodeNameClass : string
+  ) : TreeListElement {
+    console.log(currentNode);
+    const nodeContainer = currentNode.parentNode?.querySelectorAll(`.${nodeChildrenClass}`)[0] as HTMLDivElement;
+    const nodeName : string = this.__getNodeName(currentNode, nodeNameClass);
+    const nodeType : TreeListElement["type"] = this.__getNodeType(currentNode, nodeNameClass);
+    const nodeChildren : TreeListElement[] = [];
+    if (nodeContainer) {
+      const childrenNodes = nodeContainer.children;
+      Array.from(childrenNodes).forEach(childNodeElement => {
+        nodeChildren.push(this.__getTreeSnapshotRecursive(
+          childNodeElement.querySelector(`.${currentNodeClass}`) as HTMLDivElement,
+          nodeChildrenClass,
+          currentNodeClass,
+          nodeNameClass
+        ))
+      })       
+    }
+    return {
+      name : nodeName,
+      type : nodeType,
+      children : nodeChildren
+    }
+  }
+
+  __getNodeName(
+    currentNode : HTMLDivElement,
+    nodeNameClass : string
+  ) : string {
+    const treeNodeNameDiv = currentNode.getElementsByClassName(`${nodeNameClass}`)[0];
+    const treeNodeName = treeNodeNameDiv.querySelector("h1");
+    if (treeNodeName) {
+      return treeNodeName.innerHTML;
+    } else {
+      const treeNodeNameInput = treeNodeNameDiv.querySelector("input");
+      if (treeNodeNameInput) {
+        return treeNodeNameInput.value;
+      }
+    }
+    return "";
+  }
+
+  __getNodeType (
+    currentNode : HTMLDivElement,
+    nodeNameClass : string
+  ) : TreeListElement["type"] {
+    const treeNodeNameDiv = currentNode.getElementsByClassName(`${nodeNameClass}`)[0];
+    const treeNodeTagSpan = treeNodeNameDiv.querySelector("span");
+    if (treeNodeTagSpan) {
+      return "service";
+    }
+    return "category";
+  }
+
 }
+
 
 
 

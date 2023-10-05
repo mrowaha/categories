@@ -119,7 +119,7 @@ function TreeNode(props : TreeNodeProps) {
         <div>
           <div className={classes.treeNodeBranchVertical}>
              <svg xmlns="http://www.w3.org/2000/svg">
-                <line x1="0" y1="0" x2="0" y2="0" stroke="grey" stroke-width="1" />
+                <line x1="0" y1="0" x2="0" y2="0" stroke="grey" strokeWidth="1" />
             </svg>           
           </div> 
         </div> 

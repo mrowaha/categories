@@ -11,6 +11,7 @@ export interface AppStore {
   servicesState : ReturnType<typeof useServices>;
   // maintain a reference to the tree in the DOM
   treeRef : React.MutableRefObject<HTMLDivElement | null>;
+  listViewRef : React.MutableRefObject<HTMLDivElement | null>;
   zoomState : ReturnType<typeof useActiveZoom>;  
 }
 
@@ -29,6 +30,11 @@ export const useAnimator = () => {
 export const useTreeRef = () => {
   const {treeRef} = React.useContext(AppContext)!;
   return treeRef;
+}
+
+export const useListViewRef = () => {
+  const {listViewRef} = React.useContext(AppContext)!;
+  return listViewRef;
 }
 
 export const useZoomContext = () => {

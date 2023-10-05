@@ -1,0 +1,28 @@
+.modal {
+  width: 40vw;
+  height: 40vh;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 5px 5px grey;
+  overflow: scroll;
+  position: absolute;
+  z-index: 9999;
+  left: 50%;
+  top : 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  padding : 1rem;
+}
+
+.listItem {
+  width : 100%;
+}
+
+.listItemTitle {
+  display: flex;
+  gap: 2px;
+}
+
+.listItemChildren {
+  margin-left: 2rem;
+}
