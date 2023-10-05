@@ -4,6 +4,10 @@
   align-items: center;
   position: relative;
   gap : 2px;
+  background-color: #fff;
+  background-color: #fff;
+  border: 1px dashed grey;
+  padding : 0 5px;
 }
 
 .treeNode {
@@ -12,11 +16,11 @@
   width: fit-content;
   max-width: 100px;
   padding : 0.25rem;
-  color : grey;
   font-size: 0.5rem;
-  border: 1px dashed grey;
   background-color: #fff;
   position: relative;
+  color: inherit;
+
 }
 
 .newNodeModal {
@@ -58,26 +62,21 @@
   border-radius: 50%;
   background-color: #cf6679;
   position: absolute;
-  right: -5px;
-  top : -5px;
 }  
 
-.treeNode[level="0"] {
-  background-color: orange;
+.treeNodeContainer:has(.treeNode[level="0"]) {
+  color: orange;
   border: 1px solid orange;
-  color : #fff;
 }
 
-.treeNode[level="1"] {
-  background-color: #2196f3;
+.treeNodeContainer:has(.treeNode[level="1"]) {
+  color: #2196f3;
   border: 1px solid #2196f3;
-  color : #fff;
 }
 
-.treeNode[level="2"] {
-  background-color: #ccc;
-  border: 1px solid #ccc;
-  color : #fff;
+.treeNodeContainer:has(.treeNode[level="2"]) {
+  color: grey;
+  border: 1px solid grey;
 }
 
 .treeNode > input {
@@ -113,8 +112,6 @@
 
 
 .root {
-  background-color: #fff;
-  border: 1px dashed grey;
   font-size: 0.55rem;
 }
 
@@ -131,6 +128,7 @@
 
 .treeNodeContainer > svg {
   position: absolute;
+  left : 0;
 }
 
 div:has( > div.treeNodeBranchVertical) {

@@ -1,6 +1,6 @@
 import React from "react";
 import classes from "./TreeNode.module.css";
-import { useAnimator, useServicesContext, useTreeRef } from "@/context/AppContext";
+import { useAnimator, useServicesContext, useZoomContext} from "@/context/AppContext";
 import useOutsideAlerter from "@/hooks/useOutsideAlert";
 
 interface TreeActionButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -25,7 +25,7 @@ interface TreeNodeProps {
   id? : number;
   allowService?: boolean;
   isService : boolean;
-  revalidateHorizontals : () => void;
+  // revalidateHorizontals : () => void;
 }
 
 interface TreeChildNode {
@@ -43,6 +43,7 @@ function TreeNode(props : TreeNodeProps) {
   const [save, setSave] = React.useState<boolean>(false);
   const [_, setServices] = useServicesContext();
 
+  const [zoomLevel, __] = useZoomContext();
   const parentNodeRef = React.useRef<HTMLDivElement>(null);
 
   const newNodeModalRef = React.useRef<HTMLDivElement>(null);
@@ -84,26 +85,38 @@ function TreeNode(props : TreeNodeProps) {
     }
   }, []) 
 
+  // React.useEffect(() => {
+  //   animator.drawHorizontalBranchByParent(
+  //     parentNodeRef.current!,
+  //     classes.nodeChildren,
+  //     classes.treeNodeBranchVertical
+  //   )
+  //   props.revalidateHorizontals();
+  // }, [nodeChildren, props.revalidateHorizontals])
+
+  // const handleRevalidateHorizontals = React.useCallback(() => {
+  //   animator.drawHorizontalBranchByParent(
+  //     parentNodeRef.current!,
+  //     classes.nodeChildren,
+  //     classes.treeNodeBranchVertical
+  //   )
+  // }, [nodeChildren])
+
+  // React.useLayoutEffect(() => {
+  //   props.revalidateHorizontals();
+  // }, [name, save])
+
   React.useEffect(() => {
-    animator.drawHorizontalBranchByParent(
+    const cleanup = animator.drawHorizontalBranchByParent(
       parentNodeRef.current!,
       classes.nodeChildren,
       classes.treeNodeBranchVertical
-    )
-    props.revalidateHorizontals();
-  }, [nodeChildren, props.revalidateHorizontals])
-
-  const handleRevalidateHorizontals = React.useCallback(() => {
-    animator.drawHorizontalBranchByParent(
-      parentNodeRef.current!,
-      classes.nodeChildren,
-      classes.treeNodeBranchVertical
-    )
-  }, [nodeChildren])
-
-  React.useLayoutEffect(() => {
-    props.revalidateHorizontals();
-  }, [name, save])
+    )    
+    return () => {
+      console.log("running cleanup");
+      cleanup();
+    }
+  }, [zoomLevel])
 
   return (
     <div
@@ -117,12 +130,13 @@ function TreeNode(props : TreeNodeProps) {
       }}
     >
       { !props.root && 
-        <div>
+        <div style={{position : 'relative'}}>
           <div className={classes.treeNodeBranchVertical}>
              <svg xmlns="http://www.w3.org/2000/svg">
-                <line x1="0" y1="0" x2="0" y2="0" stroke="grey" strokeWidth="1" />
+                <line x1="0" y1="0" x2="0" y2="0" stroke="grey" strokeWidth="2" />
             </svg>           
-          </div> 
+          </div>
+          { props.isService && <span className={classes.serviceTag} /> } 
         </div> 
       }
       <div className={`${classes.treeNodeContainer} ` + (props.root && classes.rootContainer)}>
@@ -140,7 +154,7 @@ function TreeNode(props : TreeNodeProps) {
               <div level={nodeColorCode} className={`${classes.treeNode}`} isService={props.isService ? "yes" : "no"}>
                 {
                   props.isService && 
-                  <span className={classes.serviceTag}/>
+                  <span />
                 }
                 <h1>{name}</h1>        
                 <div ref={newNodeModalRef} className={classes.newNodeModal}>
@@ -242,15 +256,9 @@ function TreeNode(props : TreeNodeProps) {
         />
         }
       </div>
-      {
-        !props.root ? 
-          <div>
+      { 
+          nodeChildren.length > 0 && <div>
             <div className={classes.treeNodeBranchVertical}>
-            </div>
-          </div> :
-          <div>
-          {/* @ts-ignore */}
-            <div className={classes.treeNodeBranchVertical} type="large">
             </div>
           </div>
       } 
@@ -267,7 +275,7 @@ function TreeNode(props : TreeNodeProps) {
                 level={props.level+1}
                 allowService
                 isService={isService}
-                revalidateHorizontals={handleRevalidateHorizontals}
+                // revalidateHorizontals={handleRevalidateHorizontals}
                 />
               </div> 
             )

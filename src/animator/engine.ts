@@ -7,6 +7,9 @@
  * @method onTreeRelease animator handler on tree release
  * @method onTreeDrag animator handler on tree drag
  * @method onZoom animator handler on tree zoom
+ * @method drawHorizontalBranchByParent interval that re-renders the horizontal branches
+ * @method drawHorizontalBranchByNode revalidate horizontal branch for a specific node
+ * @method getTreeSnapshot gets a snapshot of the current tree as a json object
  */
 
 export type AllowedZoomLevels = 
@@ -32,7 +35,8 @@ class AnimatorEngine {
 
 
   private __zoomLevel: number;
-  private __snapshot : any;
+  // @ts-ignore
+  private __snapshot : TreeListElement;
   // used for dragging
   private __startX : number;
   private __startY : number;
@@ -55,6 +59,12 @@ class AnimatorEngine {
     this.onTreeRelease = this.onTreeRelease.bind(this);
     this.onTreeDrag = this.onTreeDrag.bind(this);
     this.onZoom = this.onZoom.bind(this);
+    this.drawHorizontalBranchByParent = this.drawHorizontalBranchByParent.bind(this);
+    this.drawHorizontalBranchByNode = this.drawHorizontalBranchByNode.bind(this);
+    this.getTreeSnapshot = this.getTreeSnapshot.bind(this);
+    this.__getTreeSnapshotRecursive = this.__getTreeSnapshotRecursive.bind(this);
+    this.__getNodeName = this.__getNodeName.bind(this);
+    this.__getNodeType = this.__getNodeType.bind(this);
   }
 
   /**
@@ -123,6 +133,7 @@ class AnimatorEngine {
     zoomLevel : AllowedZoomLevels
   ) {
     tree.style.transform = `scale(${zoomLevel / 100})`;
+    this.__zoomLevel = zoomLevel;
     const centerDiv : HTMLDivElement = document.getElementById("drawing-board-center") as HTMLDivElement;
     const treeRect = tree.getBoundingClientRect();
     centerDiv.style.width = `${treeRect.width}px`;
@@ -203,28 +214,43 @@ class AnimatorEngine {
     currentNode : HTMLDivElement,
     nodeContainerClass : string,
     svgContainerClass : string
-  ) {
+  ) : () => void {
+    console.log("running revalidation");
+    const revalidationCallback = () => {
+      const nodeContainer = currentNode.querySelectorAll(`.${nodeContainerClass}`)[0] as HTMLDivElement;
+      const nodes = nodeContainer.children;
+      Array.from(nodes).forEach(node => {
+        const currentNodeSvg = node.getElementsByClassName(svgContainerClass)[0];
+        const currentNodeSvgRect = currentNodeSvg.getBoundingClientRect();
+        const line = currentNodeSvg.querySelectorAll("*")[1];
+        const svg = currentNodeSvg.querySelectorAll("*")[0] as SVGSVGElement;
 
-    const nodeContainer = currentNode.querySelectorAll(`.${nodeContainerClass}`)[0] as HTMLDivElement;
-    const nodes = nodeContainer.children;
-    Array.from(nodes).forEach(node => {
-      const currentNodeSvg = node.getElementsByClassName(svgContainerClass)[0];
-      const currentNodeSvgRect = currentNodeSvg.getBoundingClientRect();
-      const line = currentNodeSvg.querySelectorAll("*")[1];
-
-
-      const nextSibling = node.nextElementSibling;
-      if (nextSibling) {
-        // draw the line
-        const nextNodeSvg = nextSibling.getElementsByClassName(svgContainerClass)[0];
-        const nextNodeSvgRect=  nextNodeSvg.getBoundingClientRect();
-
-        const horizontalDiff = Math.abs(currentNodeSvgRect.x - nextNodeSvgRect.x);
-        line.setAttribute("x2", `${horizontalDiff}`);
-      } else {
-        line.setAttribute("x2", "0");
-      }
-    })
+        const nextSibling = node.nextElementSibling;
+        if (nextSibling) {
+          // draw the line
+          const nextNodeSvg = nextSibling.getElementsByClassName(svgContainerClass)[0];
+          const nextNodeSvgRect=  nextNodeSvg.getBoundingClientRect();  
+          console.log("current svg: ", currentNodeSvg);
+          console.log("current node svg rect: ", currentNodeSvgRect);
+          console.log("next svg: ", nextNodeSvg);
+          console.log("next node svg rect: ", nextNodeSvgRect);
+          
+          let horizontalDiff = Math.abs(currentNodeSvgRect.x - nextNodeSvgRect.x);
+          if (this.__zoomLevel === 100) {
+            line.setAttribute("x2", `${horizontalDiff}`);
+            svg.setAttribute("width", `${horizontalDiff}`);  
+          } else {
+            line.setAttribute("x2", `${horizontalDiff / (this.__zoomLevel / 100)}`);
+            svg.setAttribute("width", `${horizontalDiff / (this.__zoomLevel / 100)}`);
+  
+          }
+        } else {
+          line.setAttribute("x2", "0");
+        }
+      })  
+    }
+    const revalidationInterval = setInterval(requestAnimationFrame, 25, revalidationCallback);
+    return () => clearInterval(revalidationInterval)
   }
 
   /**

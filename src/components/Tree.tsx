@@ -95,7 +95,7 @@ const Tree = React.forwardRef<HTMLDivElement, {}>((props, container) => {
           // @ts-ignore
           level={-1}
           isService={false}
-          revalidateHorizontals={() => {}}
+          // revalidateHorizontals={() => {}}
         />
       </div>
       <div className={classes.treeCanvasBackdrop} />
@@ -120,26 +120,26 @@ function TreeContainer () {
 
     switch(dir) {
       case "top":
-        treeRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current+20}px)`;
-        verticalTranslate.current += 20; 
+        treeRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current+10}px)`;
+        verticalTranslate.current += 10; 
         break;
       case "bottom":
-        treeRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current-20}px)`;
-        verticalTranslate.current -= 20;
+        treeRef.current.style.transform = `translate(${horizontalTranslate.current}px, ${verticalTranslate.current-10}px)`;
+        verticalTranslate.current -= 10;
         break;
       case "left":
-        treeRef.current.style.transform = `translate(${horizontalTranslate.current+20}px, ${verticalTranslate.current}px)`;
-        horizontalTranslate.current += 20;  
+        treeRef.current.style.transform = `translate(${horizontalTranslate.current+10}px, ${verticalTranslate.current}px)`;
+        horizontalTranslate.current += 10;  
         break;
       case "right":
-        treeRef.current.style.transform = `translate(${horizontalTranslate.current-20}px, ${verticalTranslate.current}px)`;
-        horizontalTranslate.current -= 20;  
+        treeRef.current.style.transform = `translate(${horizontalTranslate.current-10}px, ${verticalTranslate.current}px)`;
+        horizontalTranslate.current -= 10;  
         break;  
     }
   }
 
   const handleDrawingBoxMoveWrapper  = (dir : ArrowButtonProps["direction"]) => {
-    actionInterval.current = setInterval(handleDrawingBoxMove, 100, dir);
+    actionInterval.current = setInterval(handleDrawingBoxMove, 25, dir);
   }
 
   React.useEffect(() => {
