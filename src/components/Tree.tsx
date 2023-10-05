@@ -95,6 +95,7 @@ const Tree = React.forwardRef<HTMLDivElement, {}>((props, container) => {
           // @ts-ignore
           level={-1}
           isService={false}
+          revalidateHorizontals={() => {}}
         />
       </div>
       <div className={classes.treeCanvasBackdrop} />

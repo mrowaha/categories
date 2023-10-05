@@ -193,7 +193,7 @@ class AnimatorEngine {
    * @param {string} nodeContainerClass
    * @param {string} svgContainerClass
   */
-  drawHorizontalBranch(
+  drawHorizontalBranchByParent(
     currentNode : HTMLDivElement,
     nodeContainerClass : string,
     svgContainerClass : string
@@ -221,7 +221,35 @@ class AnimatorEngine {
     })
   }
 
+  /**
+ * animator support for drawing vertical branches between two nodes 
+ * over the canvas backdrop for the tree
+ * @param {HTMLDivElement} currentNode
+ * @param {string} svgContainerClass
+ */
+  drawHorizontalBranchByNode(
+  currentNode : HTMLDivElement,
+  svgContainerClass : string
+  ) {
+
+    const currentNodeSvg = currentNode.getElementsByClassName(svgContainerClass)[0];
+    const currentNodeSvgRect = currentNodeSvg.getBoundingClientRect();
+    const line = currentNodeSvg.querySelectorAll("*")[1];
+    const nextSibling = currentNode.nextElementSibling;
+    if (nextSibling) {
+      // draw the line
+      const nextNodeSvg = nextSibling.getElementsByClassName(svgContainerClass)[0];
+      const nextNodeSvgRect=  nextNodeSvg.getBoundingClientRect();
+
+      const horizontalDiff = Math.abs(currentNodeSvgRect.x - nextNodeSvgRect.x);
+      line.setAttribute("x2", `${horizontalDiff}`);
+    } else {
+      line.setAttribute("x2", "0");
+    }
+  }
 }
+
+
 
 
 

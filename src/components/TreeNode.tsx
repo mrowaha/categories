@@ -25,6 +25,7 @@ interface TreeNodeProps {
   id? : number;
   allowService?: boolean;
   isService : boolean;
+  revalidateHorizontals : () => void;
 }
 
 interface TreeChildNode {
@@ -36,7 +37,6 @@ function TreeNode(props : TreeNodeProps) {
 
   const nodeColorCode = props.level % 3;
   const animator = useAnimator();
-  const treeRef = useTreeRef();
   const [nextId, setNextId] = React.useState<number>(1);
   const [nodeChildren, setNodeChildren] = React.useState<TreeChildNode[]>([]);
   const [name, setName] = React.useState<string>("");
@@ -44,7 +44,6 @@ function TreeNode(props : TreeNodeProps) {
   const [_, setServices] = useServicesContext();
 
   const parentNodeRef = React.useRef<HTMLDivElement>(null);
-  const horizontalLineRef = React.useRef<SVGSVGElement>(null);
 
   const newNodeModalRef = React.useRef<HTMLDivElement>(null);
   useOutsideAlerter(newNodeModalRef, () => {
@@ -66,7 +65,10 @@ function TreeNode(props : TreeNodeProps) {
   }
 
   const handleNewNode = (isService : boolean) => {
-    if (isService) setServices(prev => prev+1);
+    if (isService) {
+      console.log("creating service");
+      setServices(prev => prev+2)
+    }
     setNodeChildren(prev => [...prev, {id : nextId, isService : isService}]);
     setNextId(prev => prev+1);
     if (newNodeModalRef.current)                 
@@ -80,15 +82,28 @@ function TreeNode(props : TreeNodeProps) {
     return () => {
       if (props.isService) setServices(prev => prev-1)
     }
-  }, [props.isService]) 
+  }, []) 
 
   React.useEffect(() => {
-    animator.drawHorizontalBranch(
+    animator.drawHorizontalBranchByParent(
+      parentNodeRef.current!,
+      classes.nodeChildren,
+      classes.treeNodeBranchVertical
+    )
+    props.revalidateHorizontals();
+  }, [nodeChildren, props.revalidateHorizontals])
+
+  const handleRevalidateHorizontals = React.useCallback(() => {
+    animator.drawHorizontalBranchByParent(
       parentNodeRef.current!,
       classes.nodeChildren,
       classes.treeNodeBranchVertical
     )
   }, [nodeChildren])
+
+  React.useLayoutEffect(() => {
+    props.revalidateHorizontals();
+  }, [name, save])
 
   return (
     <div
@@ -251,6 +266,7 @@ function TreeNode(props : TreeNodeProps) {
                 level={props.level+1}
                 allowService
                 isService={isService}
+                revalidateHorizontals={handleRevalidateHorizontals}
                 />
               </div> 
             )

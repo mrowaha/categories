@@ -74,6 +74,7 @@
   width: fit-content;
   position : absolute;
   cursor: pointer;
+  padding : 1rem;
 }
 
 .tree {
